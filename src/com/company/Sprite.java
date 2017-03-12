@@ -1,9 +1,5 @@
 package com.company;
 
-import java.awt.*;
-
-package org.tides.tutorial;
-
         import java.awt.Graphics;
         import java.awt.Image;
 
@@ -18,11 +14,13 @@ public class Sprite {
         return image.getWidth(null);
     }
 
-    public int getHeight() {
+    public int getHeight()
+    {
         return image.getHeight(null);
     }
 
-    public void draw(Graphics g,int x,int y) {
+    public void draw(Graphics g, int x, int y)
+    {
         g.drawImage(image,x,y,null);
     }
 }

@@ -1,38 +1,26 @@
-package org.tides.tutorial;
+package com.company;
 
-import com.company.Sprite;
-
-import java.awt.BorderLayout;
-import java.awt.Canvas;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Toolkit;
+import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferStrategy;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.net.URL;
-
-import javax.imageio.ImageIO;
-import javax.swing.JFrame;
+import javax.swing.*;
 
 public class Game extends Canvas implements Runnable {
     private static final long serialVersionUID = 1L;
+    private int minY = 500;
+    Hero hero = new Hero(0,0,0.03,0.1,0.1);
+    Texture texture = new Texture();
 
     private boolean running;
 
-    public static int WIDTH = 400;
-    public static int HEIGHT = 300;
-    public static String NAME = "TUTORIAL 1";
-
+    public static int WIDTH = 800;
+    public static int HEIGHT = 600;
+    public static String NAME = "First Stage";
     private boolean leftPressed = false;
     private boolean rightPressed = false;
-
-    public static Sprite hero;
-    private static int x = 0;
-    private static int y = 0;
+    private boolean upPressed = false;
 
     public void start() {
         running = true;
@@ -40,9 +28,8 @@ public class Game extends Canvas implements Runnable {
     }
 
     public void run() {
-        long lastTime = System.currentTimeMillis();
         long delta;
-
+        long lastTime = System.currentTimeMillis();
         init();
 
         while(running) {
@@ -55,7 +42,7 @@ public class Game extends Canvas implements Runnable {
 
     public void init() {
         addKeyListener(new KeyInputHandler());
-        hero = getSprite("man.png");
+        hero.image = getSprite("pictures/man.png");
     }
 
     public void render() {
@@ -69,47 +56,49 @@ public class Game extends Canvas implements Runnable {
         Graphics g = bs.getDrawGraphics();
         g.setColor(Color.black);
         g.fillRect(0, 0, getWidth(), getHeight());
-        hero.draw(g, x, y);
+        hero.image.draw(g, hero.getX(), hero.getY());
         g.dispose();
         bs.show();
     }
 
     public void update(long delta) {
+
+
         if (leftPressed == true) {
-            x--;
+            hero.setX((int) (hero.getX() - (hero.getAx() * delta * delta) / 2));
         }
+
         if (rightPressed == true) {
-            x++;
+            hero.setX((int) (hero.getX() + (hero.getAx() * delta * delta) / 2));
         }
+
+        if ((upPressed == true) && (hero.getY() > 200)){
+            hero.setVy(0.2);
+            hero.setY( (int) (hero.getY() - hero.getVy() * delta + (hero.getAy() * delta * delta) / 2));
+            hero.setY(hero.getY()-1);
+        }
+
+        if (upPressed == false) {
+            if (hero.getY() <= minY) {
+            hero.setY((int) (hero.getY() - hero.getVy() * delta + (hero.getAy() * delta * delta) / 2));
+        }
+    }
+        if (hero.getY() < minY -200) {
+            hero.setVy(0);
+        }
+
     }
 
     public Sprite getSprite(String path) {
-        BufferedImage sourceImage = null;
+        URL url = Game.class.getResource(path);
+        Image sourceImage = new ImageIcon(url).getImage();
 
-        try {
-            URL url = this.getClass().getClassLoader().getResource(path);
-            sourceImage = ImageIO.read(url);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
 
-        Sprite sprite = new Sprite(Toolkit.getDefaultToolkit().createImage(sourceImage.getSource()));
+        Sprite sprite = new Sprite(sourceImage);
 
         return sprite;
     }
 
-    public static void main(String[] args) {
-        Game game = new Game();
-        game.setPreferredSize(new Dimension(WIDTH, HEIGHT));
-        JFrame frame = new JFrame(Game.NAME);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setLayout(new BorderLayout());
-        frame.add(game, BorderLayout.CENTER);
-        frame.pack();
-        frame.setResizable(false);
-        frame.setVisible(true);
-        game.start();
-    }
 
     private class KeyInputHandler extends KeyAdapter {
         public void keyPressed(KeyEvent e) {
@@ -119,6 +108,9 @@ public class Game extends Canvas implements Runnable {
             if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
                 rightPressed = true;
             }
+            if ((e.getKeyCode() == KeyEvent.VK_UP) && (hero.y >= minY -1)) {
+                upPressed = true;
+            }
         }
 
         public void keyReleased(KeyEvent e) {
@@ -127,6 +119,9 @@ public class Game extends Canvas implements Runnable {
             }
             if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
                 rightPressed = false;
+            }
+            if (e.getKeyCode() == KeyEvent.VK_UP) {
+                upPressed = false;
             }
         }
     }

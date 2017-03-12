@@ -1,8 +1,23 @@
 package com.company;
 
-public class Main {
+import javax.swing.*;
+import java.awt.*;
 
+import static com.company.Game.HEIGHT;
+import static com.company.Game.WIDTH;
+
+
+public class Main {
     public static void main(String[] args) {
-	// write your code here
+        Game game = new Game();
+        game.setPreferredSize(new Dimension(WIDTH, HEIGHT));
+        JFrame frame = new JFrame(com.company.Game.NAME);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setLayout(new BorderLayout());
+        frame.add(game, BorderLayout.CENTER);
+        frame.pack();
+        frame.setResizable(false);
+        frame.setVisible(true);
+        game.start();
     }
 }
