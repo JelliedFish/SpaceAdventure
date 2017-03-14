@@ -9,9 +9,10 @@ import javax.swing.*;
 
 public class Game extends Canvas implements Runnable {
     private static final long serialVersionUID = 1L;
-    private int minY = 500;
-    Hero hero = new Hero(0,0,0.03,0.1,0.1);
+    static int minY = 500;
+    Hero hero = new Hero(0, 0, 0.03, 0.1, 0.1);
     Texture texture = new Texture();
+
 
     private boolean running;
 
@@ -32,7 +33,7 @@ public class Game extends Canvas implements Runnable {
         long lastTime = System.currentTimeMillis();
         init();
 
-        while(running) {
+        while (running) {
             delta = System.currentTimeMillis() - lastTime;
             lastTime = System.currentTimeMillis();
             render();
@@ -62,31 +63,28 @@ public class Game extends Canvas implements Runnable {
     }
 
     public void update(long delta) {
-
-
-        if (leftPressed == true) {
+        //  System.out.println("y=" + hero.getY());
+        if (leftPressed) {
             hero.setX((int) (hero.getX() - (hero.getAx() * delta * delta) / 2));
         }
 
-        if (rightPressed == true) {
+        if (rightPressed) {
             hero.setX((int) (hero.getX() + (hero.getAx() * delta * delta) / 2));
         }
 
-        if ((upPressed == true) && (hero.getY() > 200)){
+       /* if ((upPressed) && (hero.getY() > 200)) {
             hero.setVy(0.2);
-            hero.setY( (int) (hero.getY() - hero.getVy() * delta + (hero.getAy() * delta * delta) / 2));
-            hero.setY(hero.getY()-1);
-        }
-
-        if (upPressed == false) {
-            if (hero.getY() <= minY) {
             hero.setY((int) (hero.getY() - hero.getVy() * delta + (hero.getAy() * delta * delta) / 2));
-        }
-    }
-        if (hero.getY() < minY -200) {
-            hero.setVy(0);
+            hero.setY(hero.getY() - 1);
         }
 
+        if (!upPressed) {
+            if (hero.getY() <= minY) {
+                hero.setY((int) (hero.getY() - hero.getVy() * delta + (hero.getAy() * delta * delta) / 2));
+            }
+        }*/
+
+        hero.calculatePhisics((double)delta/100);
     }
 
     public Sprite getSprite(String path) {
@@ -108,7 +106,7 @@ public class Game extends Canvas implements Runnable {
             if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
                 rightPressed = true;
             }
-            if ((e.getKeyCode() == KeyEvent.VK_UP) && (hero.y >= minY -1)) {
+            if ((e.getKeyCode() == KeyEvent.VK_UP) && (hero.y >= minY - 1)) {
                 upPressed = true;
             }
         }
@@ -121,10 +119,15 @@ public class Game extends Canvas implements Runnable {
                 rightPressed = false;
             }
             if (e.getKeyCode() == KeyEvent.VK_UP) {
+                if (upPressed)
+                    processUpPressed();
                 upPressed = false;
             }
         }
     }
+
+    private void processUpPressed() {
+        System.out.println("KEY_DOWN");
+        hero.setVy(-100);
+    }
 }
-
-

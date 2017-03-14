@@ -3,9 +3,12 @@ package com.company;
 /**
  * Created by Илюха on 04.03.2017.
  */
+import static com.company.Game.minY;
+
 public class Hero {
-     int x;
-     int y;
+    static double ACC = 19.8;
+    int x;
+    int y;
 
     double Vx;
     double Vy;
@@ -60,5 +63,17 @@ public class Hero {
         Vy = vy;
         this.ay = ay;
         this.ax = ax;
+    }
+
+    public void calculatePhisics(double delta){
+        if (y > minY) {
+            Vy=0;
+            y = minY;
+        }else{
+            Vy += ACC*delta;
+        }
+        y += (int)Vy*delta;
+        System.out.println(y+" "+Vy);
+
     }
 }
