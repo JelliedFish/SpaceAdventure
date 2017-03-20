@@ -6,22 +6,22 @@ import java.awt.event.KeyEvent;
 import java.awt.image.BufferStrategy;
 import java.net.URL;
 import javax.swing.*;
+import java.util.PriorityQueue;
+import java.util.Queue;
+
 
 public class Game extends Canvas implements Runnable {
     private static final long serialVersionUID = 1L;
     static int minY = 500;
-    Hero hero = new Hero(0, 0, 0.03, 0.1, 0.1);
-    Texture texture = new Texture();
-
-
+    Hero hero = new Hero(500, 200, 0.03, 0.1);
+    public Queue <Texture> textureQueue = new PriorityQueue<Texture>();
     private boolean running;
 
-    public static int WIDTH = 800;
-    public static int HEIGHT = 600;
+    private static final int deltaConst = 100;
+    public static int WIDTH = 1000;
+    public static int HEIGHT = 800;
     public static String NAME = "First Stage";
-    private boolean leftPressed = false;
-    private boolean rightPressed = false;
-    private boolean upPressed = false;
+    boolean upPressed = false;
 
     public void start() {
         running = true;
@@ -30,17 +30,24 @@ public class Game extends Canvas implements Runnable {
 
     public void run() {
         long delta;
+        long deltaTexture;
         long lastTime = System.currentTimeMillis();
+        long cnt = 0;
         init();
 
         while (running) {
-            delta = System.currentTimeMillis() - lastTime;
+            delta = (System.currentTimeMillis() - lastTime);
             lastTime = System.currentTimeMillis();
             render();
-            update(delta);
+            update((double) delta / deltaConst);
+            cnt++;
+            System.out.println(cnt);
+            if (cnt >= 2500) {
+                cnt = 0;
+                textureQueue.add(new Texture(1000, 200, 0.1));
+            }
         }
     }
-
     public void init() {
         addKeyListener(new KeyInputHandler());
         hero.image = getSprite("pictures/man.png");
@@ -58,36 +65,20 @@ public class Game extends Canvas implements Runnable {
         g.setColor(Color.black);
         g.fillRect(0, 0, getWidth(), getHeight());
         hero.image.draw(g, hero.getX(), hero.getY());
+        for(Texture texture : textureQueue)
+           texture.image.draw(g,texture.getX(), texture.getY());
         g.dispose();
         bs.show();
     }
-
-    public void update(long delta) {
-        //  System.out.println("y=" + hero.getY());
-        if (leftPressed) {
-            hero.setX((int) (hero.getX() - (hero.getAx() * delta * delta) / 2));
-        }
-
-        if (rightPressed) {
-            hero.setX((int) (hero.getX() + (hero.getAx() * delta * delta) / 2));
-        }
-
-       /* if ((upPressed) && (hero.getY() > 200)) {
-            hero.setVy(0.2);
-            hero.setY((int) (hero.getY() - hero.getVy() * delta + (hero.getAy() * delta * delta) / 2));
-            hero.setY(hero.getY() - 1);
-        }
-
-        if (!upPressed) {
-            if (hero.getY() <= minY) {
-                hero.setY((int) (hero.getY() - hero.getVy() * delta + (hero.getAy() * delta * delta) / 2));
-            }
-        }*/
-
-        hero.calculatePhisics((double)delta/100);
+    //
+    public void update(double delta) {
+        hero.calculatePhysics(delta);
+        /*if(textureQueue != null && !textureQueue.isEmpty() && textureQueue.peek().getX() < -200 )
+            textureQueue.poll();*/
+        for(Texture texture : textureQueue) texture.calculateMoving(delta);
     }
 
-    public Sprite getSprite(String path) {
+    public static Sprite getSprite(String path) {
         URL url = Game.class.getResource(path);
         Image sourceImage = new ImageIcon(url).getImage();
 
@@ -100,24 +91,13 @@ public class Game extends Canvas implements Runnable {
 
     private class KeyInputHandler extends KeyAdapter {
         public void keyPressed(KeyEvent e) {
-            if (e.getKeyCode() == KeyEvent.VK_LEFT) {
-                leftPressed = true;
-            }
-            if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
-                rightPressed = true;
-            }
+
             if ((e.getKeyCode() == KeyEvent.VK_UP) && (hero.y >= minY - 1)) {
                 upPressed = true;
             }
         }
 
         public void keyReleased(KeyEvent e) {
-            if (e.getKeyCode() == KeyEvent.VK_LEFT) {
-                leftPressed = false;
-            }
-            if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
-                rightPressed = false;
-            }
             if (e.getKeyCode() == KeyEvent.VK_UP) {
                 if (upPressed)
                     processUpPressed();
@@ -127,7 +107,6 @@ public class Game extends Canvas implements Runnable {
     }
 
     private void processUpPressed() {
-        System.out.println("KEY_DOWN");
         hero.setVy(-100);
     }
 }

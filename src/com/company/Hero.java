@@ -10,10 +10,11 @@ public class Hero {
     int x;
     int y;
 
+    Texture texture = new Texture(800, 200, 1.5);
+
     double Vx;
     double Vy;
     double ay;
-    double ax;
 
     public void setX(int x) {
         this.x = x;
@@ -22,6 +23,7 @@ public class Hero {
     public void setY(int y) {
         this.y = y;
     }
+
     public void setVy(double vy) {
         Vy = vy;
     }
@@ -30,11 +32,12 @@ public class Hero {
         this.ay = ay;
     }
 
-    public void setAx(double ax) {
-        this.ax = ax;
+    public void setVx(int Vx) {
+        this.Vx = Vx;
     }
 
-    public Sprite image;
+
+    public Sprite image ;
 
     public int getX() {
         return x;
@@ -49,31 +52,33 @@ public class Hero {
         return Vy;
     }
 
+    public double getVx() {
+        return Vx;
+    }
+
     public double getAy() {
         return ay;
     }
 
-    public double getAx() {
-        return ax;
-    }
-
-    public Hero(int x, int y,double vy, double ay, double ax) {
+    public Hero(int x, int y, double vy, double ay) {
         this.x = x;
         this.y = y;
         Vy = vy;
         this.ay = ay;
-        this.ax = ax;
     }
 
-    public void calculatePhisics(double delta){
+    public void calculatePhysics(double delta) {
         if (y > minY) {
-            Vy=0;
+            Vy = 0;
             y = minY;
-        }else{
-            Vy += ACC*delta;
+        } else {
+            Vy += ACC * delta;
         }
-        y += (int)Vy*delta;
-        System.out.println(y+" "+Vy);
-
+        y += (int) Vy * delta;
+       // System.out.println(Vy);
+        if (this.y <= (texture.getY())){ //texture.image.getWidth()) {
+            Vy = 0;
+            y++;
+        }
     }
 }
