@@ -8,49 +8,72 @@ import java.net.URL;
 import javax.swing.*;
 import java.util.PriorityQueue;
 import java.util.Queue;
+import java.util.concurrent.TimeUnit;
 
 
 public class Game extends Canvas implements Runnable {
-    private static final long serialVersionUID = 1L;
-    static int minY = 500;
-    Hero hero = new Hero(500, 200, 0.03, 0.1);
-    public Queue <Texture> textureQueue = new PriorityQueue<Texture>();
-    private boolean running;
 
-    private static final int deltaConst = 100;
-    public static int WIDTH = 1000;
-    public static int HEIGHT = 800;
+    private static final long serialVersionUID = 1L;
+    public static Hero hero = new Hero(Constants.SPAWN_FOR_HERO, Constants.minY, Constants.Vy_FOR_HERO, Constants.Ay_FOR_HERO);
+    Animation img = new Animation();
+    Floor floor = new Floor(Constants.SPAWNx_FOR_FLOOR,Constants.SPAWNy_FOR_FLOOR,Constants.Vx_FOR_TEXTURE);
+    public Queue <Block> blockQueue = new PriorityQueue<Block>();
+    private boolean running;
+    private boolean gameOver;
+    private Sprite backgroundImg  = getSprite("pictures/Background.png");
     public static String NAME = "First Stage";
+    private static int cnt ;
     boolean upPressed = false;
+    boolean CHECK_THE_RESTART = false;
+    public static boolean CHECK_THE_JUMP = false;
+    public  static int cnt1 = 0;
+
 
     public void start() {
         running = true;
         new Thread(this).start();
     }
 
-    public void run() {
+    public void run(){
         long delta;
-        long deltaTexture;
         long lastTime = System.currentTimeMillis();
-        long cnt = 0;
         init();
 
         while (running) {
             delta = (System.currentTimeMillis() - lastTime);
             lastTime = System.currentTimeMillis();
             render();
-            update((double) delta / deltaConst);
+            update((double) delta / Constants.deltaConst);
             cnt++;
-            System.out.println(cnt);
-            if (cnt >= 2500) {
+
+            if (cnt >= Constants.FREQUENCY_FOR_BLOCK) {
                 cnt = 0;
-                textureQueue.add(new Texture(1000, 200, 0.1));
+                blockQueue.add(new Block((int)Constants.SPAWN_FOR_BLOCK, Constants.minY, Constants.Vx_FOR_TEXTURE, 3));
+            }
+
+            if(gameOver) {
+                try{
+                    TimeUnit.SECONDS.sleep(1);
+                }catch(Exception e){
+                    System.out.print(e);
+                }
+                CHECK_THE_RESTART = true;
             }
         }
     }
+
+    private void restart(){
+        hero = new Hero(Constants.SPAWN_FOR_HERO, Constants.minY, Constants.Vy_FOR_HERO, Constants.Ay_FOR_HERO);
+        Floor floor = new Floor(Constants.SPAWNx_FOR_FLOOR,Constants.SPAWNy_FOR_FLOOR,Constants.Vx_FOR_TEXTURE);
+        Queue <Block> blockQueue = new PriorityQueue<Block>();
+        gameOver = false;
+        running = true;
+    }
+
     public void init() {
+        cnt = 0;
         addKeyListener(new KeyInputHandler());
-        hero.image = getSprite("pictures/man.png");
+
     }
 
     public void render() {
@@ -63,37 +86,64 @@ public class Game extends Canvas implements Runnable {
 
         Graphics g = bs.getDrawGraphics();
         g.setColor(Color.black);
-        g.fillRect(0, 0, getWidth(), getHeight());
-        hero.image.draw(g, hero.getX(), hero.getY());
-        for(Texture texture : textureQueue)
-           texture.image.draw(g,texture.getX(), texture.getY());
+        g.setColor(Color.black);
+        g.fillRect(0,0, getWidth(), getHeight());
+        backgroundImg.draw(g,0,0);
+
+        if (floor.getX()+Constants.HEIGHT <= Constants.HEIGHT+Constants.FREQUENCY_FOR_FLOOR) {
+            floor = new Floor(Constants.SPAWNx_FOR_FLOOR, Constants.SPAWNy_FOR_FLOOR,Constants.Vx_FOR_TEXTURE);
+        }
+        floor.image.draw(g,floor.getX(),floor.getY());
+
+        cnt1++;
+        if(hero != null){
+                img.HeroImages();
+                hero.image.draw(g, hero.getX(), hero.getY());
+        }
+
+        for(Block block : blockQueue)
+           block.image.draw(g, block.getX(), block.getY());
         g.dispose();
         bs.show();
+
     }
-    //
+
     public void update(double delta) {
-        hero.calculatePhysics(delta);
-        /*if(textureQueue != null && !textureQueue.isEmpty() && textureQueue.peek().getX() < -200 )
-            textureQueue.poll();*/
-        for(Texture texture : textureQueue) texture.calculateMoving(delta);
+
+        hero.jump(delta);
+        floor.FloorMoving(delta);
+
+        if(blockQueue != null && !blockQueue.isEmpty() && blockQueue.peek().getX() < -200 )
+            blockQueue.poll();
+        if(blockQueue != null && !blockQueue.isEmpty()) {
+            for(Block block : blockQueue){
+                if(block.overlaps(hero)) gameOver = true;
+            }
+        }
+        for(Block block : blockQueue) block.BlockMoving(delta);
+
     }
 
     public static Sprite getSprite(String path) {
         URL url = Game.class.getResource(path);
         Image sourceImage = new ImageIcon(url).getImage();
-
-
         Sprite sprite = new Sprite(sourceImage);
-
         return sprite;
     }
 
 
     private class KeyInputHandler extends KeyAdapter {
+
         public void keyPressed(KeyEvent e) {
 
-            if ((e.getKeyCode() == KeyEvent.VK_UP) && (hero.y >= minY - 1)) {
+            if ((e.getKeyCode() == KeyEvent.VK_UP) && (hero.getY() >= Constants.minY - 1)) {
                 upPressed = true;
+            }
+
+            if (((e.getKeyCode() == KeyEvent.VK_SPACE)) && (CHECK_THE_RESTART == true)) {
+                restart();
+                CHECK_THE_RESTART = false;
+
             }
         }
 
@@ -103,10 +153,13 @@ public class Game extends Canvas implements Runnable {
                     processUpPressed();
                 upPressed = false;
             }
+
+
         }
     }
 
-    private void processUpPressed() {
-        hero.setVy(-100);
+    private void processUpPressed()
+    {
+        hero.setVy(Constants.MAXVy_FOR_HERO);
     }
 }

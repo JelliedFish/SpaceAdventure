@@ -1,12 +1,9 @@
 package com.company;
 
-import java.util.Queue;
-
 public class Floor {
 
         int x;
         int y;
-        int right_corner_coord;
 
         double Vx;
 
@@ -42,13 +39,12 @@ public class Floor {
             this.x = x;
             this.y = y;
             this.Vx = Vx;
+            image = Game.getSprite("pictures/floor.png");
         }
 
-        Floor(int right_corner_coord) {
-            this.right_corner_coord = right_corner_coord;
-        }
 
-        public void calculateMoving(double delta) {
+        public void FloorMoving(double delta)
+        {
             this.x = (int) (this.x - this.Vx * delta);
         }
     }

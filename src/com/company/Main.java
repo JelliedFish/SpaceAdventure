@@ -3,8 +3,8 @@ package com.company;
 import javax.swing.*;
 import java.awt.*;
 
-import static com.company.Game.HEIGHT;
-import static com.company.Game.WIDTH;
+import static com.company.Constants.HEIGHT;
+import static com.company.Constants.WIDTH;
 
 
 public class Main {

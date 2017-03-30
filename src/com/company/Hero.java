@@ -1,20 +1,13 @@
 package com.company;
 
-/**
- * Created by Илюха on 04.03.2017.
- */
-import static com.company.Game.minY;
-
 public class Hero {
-    static double ACC = 19.8;
-    int x;
-    int y;
 
-    Texture texture = new Texture(800, 200, 1.5);
+    public Sprite image ;
+    private int x;
+    private int y;
 
-    double Vx;
-    double Vy;
-    double ay;
+    private double Vy;
+    private double ay;
 
     public void setX(int x) {
         this.x = x;
@@ -32,12 +25,6 @@ public class Hero {
         this.ay = ay;
     }
 
-    public void setVx(int Vx) {
-        this.Vx = Vx;
-    }
-
-
-    public Sprite image ;
 
     public int getX() {
         return x;
@@ -52,10 +39,6 @@ public class Hero {
         return Vy;
     }
 
-    public double getVx() {
-        return Vx;
-    }
-
     public double getAy() {
         return ay;
     }
@@ -65,20 +48,26 @@ public class Hero {
         this.y = y;
         Vy = vy;
         this.ay = ay;
-    }
+        image = Game.getSprite("pictures/sprites_8.run1.png");
+        }
 
-    public void calculatePhysics(double delta) {
-        if (y > minY) {
+    public void jump(double delta) {
+        if (y > Constants.minY) {
             Vy = 0;
-            y = minY;
+            y = Constants.minY;
         } else {
-            Vy += ACC * delta;
+            Vy += Constants.ACC * delta;
         }
         y += (int) Vy * delta;
-       // System.out.println(Vy);
-        if (this.y <= (texture.getY())){ //texture.image.getWidth()) {
-            Vy = 0;
-            y++;
+        if (Vy > 20) {
+            image = Game.getSprite("pictures/sprites.jumpUP.png");
+            Game.CHECK_THE_JUMP = true;
         }
+        if (Vy <-20){
+            image = Game.getSprite("pictures/sprites.jumpDOWN.png");
+            Game.CHECK_THE_JUMP = true;
+        }
+        if ((y <= Constants.minY) && (y >= Constants.minY-10))
+            Game.CHECK_THE_JUMP = false;
     }
 }
