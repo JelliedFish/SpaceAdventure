@@ -4,10 +4,12 @@ import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferStrategy;
+import java.awt.image.BufferedImage;
 import java.net.URL;
 import javax.swing.*;
 import java.util.PriorityQueue;
 import java.util.Queue;
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 
@@ -18,6 +20,7 @@ public class Game extends Canvas implements Runnable {
     Animation img = new Animation();
     Floor floor = new Floor(Constants.SPAWNx_FOR_FLOOR,Constants.SPAWNy_FOR_FLOOR,Constants.Vx_FOR_TEXTURE);
     public Queue <Block> blockQueue = new PriorityQueue<Block>();
+    Random RG = new Random();
     private boolean running;
     private boolean gameOver;
     private Sprite backgroundImg  = getSprite("pictures/Background.png");
@@ -48,7 +51,7 @@ public class Game extends Canvas implements Runnable {
 
             if (cnt >= Constants.FREQUENCY_FOR_BLOCK) {
                 cnt = 0;
-                blockQueue.add(new Block((int)Constants.SPAWN_FOR_BLOCK, Constants.minY, Constants.Vx_FOR_TEXTURE, 3));
+                blockQueue.add(new Block((int)Constants.SPAWN_FOR_BLOCK, Constants.SPAWNy_FOR_BLOCK, Constants.Vx_FOR_TEXTURE,RG.nextInt(3)));
             }
 
             if(gameOver) {
@@ -90,9 +93,10 @@ public class Game extends Canvas implements Runnable {
         g.fillRect(0,0, getWidth(), getHeight());
         backgroundImg.draw(g,0,0);
 
-        if (floor.getX()+Constants.HEIGHT <= Constants.HEIGHT+Constants.FREQUENCY_FOR_FLOOR) {
+        if (floor.getX() <= Constants.FREQUENCY_FOR_FLOOR) {
             floor = new Floor(Constants.SPAWNx_FOR_FLOOR, Constants.SPAWNy_FOR_FLOOR,Constants.Vx_FOR_TEXTURE);
         }
+
         floor.image.draw(g,floor.getX(),floor.getY());
 
         cnt1++;

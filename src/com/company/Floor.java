@@ -2,10 +2,11 @@ package com.company;
 
 public class Floor {
 
-        int x;
-        int y;
+        private int x;
+        private int y;
 
-        double Vx;
+        private double Vx;
+        Sprite image;
 
         public void setX(int x) {
             this.x = x;
@@ -20,7 +21,7 @@ public class Floor {
         }
 
 
-        public Sprite image;
+
 
         public int getX() {
             return x;

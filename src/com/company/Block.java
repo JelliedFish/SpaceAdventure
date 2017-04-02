@@ -42,11 +42,11 @@ public class Block implements Comparable<Block> {
         this.y = y;
         this.Vx = Vx;
         switch(height){
-            case 1 : image = Game.getSprite("pictures/large_block.png");
+            case 0 : image = Game.getSprite("pictures/Block3.png");
                 break;
-            case 2 : image = Game.getSprite("pictures/medium_block.png");
+            case 1 : image = Game.getSprite("pictures/Block2.png");
                 break;
-            case 3 : image = Game.getSprite("pictures/small_block.png");
+            case 2 : image = Game.getSprite("pictures/Block1.png");
                 break;
         }
 
