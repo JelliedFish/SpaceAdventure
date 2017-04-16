@@ -42,11 +42,10 @@ public class Block implements Comparable<Block> {
         this.y = y;
         this.Vx = Vx;
         switch(height){
-            case 0 : image = Game.getSprite("pictures/Block3.png");
-                break;
-            case 1 : image = Game.getSprite("pictures/Block2.png");
-                break;
-            case 2 : image = Game.getSprite("pictures/Block1.png");
+            case 0 : image = Game.getSprite("pictures/Block1.png");
+               break;
+
+            case 1 : image = Game.getSprite("pictures/Block3.png");
                 break;
         }
 
@@ -66,7 +65,7 @@ public class Block implements Comparable<Block> {
     }
 
     public boolean overlaps(Hero hero){
-        return this.x < (hero.getX() + hero.image.getWidth()) && (this.x + this.image.getWidth())  > hero.getX() &&
-                            this.y < (hero.getY() + hero.image.getHeight()) && (this.y + this.image.getHeight() > hero.getY());
+        return this.x < (hero.getX() + hero.image.getWidth()-15) && (this.x + this.image.getWidth()-15)  > hero.getX() &&
+                            this.y < (hero.getY() + hero.image.getHeight()-15) && (this.y + this.image.getHeight() > hero.getY()-15);
     }
 }

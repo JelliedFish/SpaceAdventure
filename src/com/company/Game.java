@@ -9,6 +9,7 @@ import javax.swing.*;
 import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Random;
+import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
 
@@ -16,7 +17,6 @@ public class Game extends Canvas implements Runnable {
 
     private static final long serialVersionUID = 1L;
     static Hero hero = new Hero(Constants.SPAWN_FOR_HERO, Constants.minY, Constants.Vy_FOR_HERO,Constants.Vx_FOR_TEXTURE, Constants.Ay_FOR_HERO);
-    Animation img = new Animation();
     Floor floor = new Floor(Constants.SPAWNx_FOR_FLOOR,Constants.SPAWNy_FOR_FLOOR);
     public Queue <Block> blockQueue = new PriorityQueue<Block>();
     Random RG = new Random();
@@ -24,15 +24,14 @@ public class Game extends Canvas implements Runnable {
     private boolean gameOver;
     private Sprite backgroundImg  = getSprite("pictures/Background.png");
     static String NAME = "First Stage";
-    private static int cnt ;
+    int pos;
     private boolean upPressed = false;
     private boolean leftPressed = false;
     private boolean rightPressed = false;
     static boolean MaxSpeed = false;
     private boolean CHECK_THE_RESTART = false;
     static boolean CHECK_THE_JUMP = false;
-    static int Check_The_Animation = 0;
-    private static int Check_The_Speed = 0;
+    static int Check_The_Speed = 0;
     double Block_Speed = Constants.Vx_FOR_TEXTURE;
 
     public void start() {
@@ -50,32 +49,24 @@ public class Game extends Canvas implements Runnable {
             lastTime = System.currentTimeMillis();
             render();
             update((double) delta / Constants.deltaConst);
-            cnt++;
-            Check_The_Animation++;
-            Check_The_Speed++;
 
-            if (cnt >= Constants.FREQUENCY_FOR_BLOCK) {
-                cnt = 0;
-                blockQueue.add(new Block((int)Constants.SPAWN_FOR_BLOCK, Constants.SPAWNy_FOR_BLOCK, Block_Speed,RG.nextInt(3)));
-            }
-
-            if ((Check_The_Speed >= 10) && (!MaxSpeed)) {
+            /* if ((Check_The_Speed >= 10) && (!MaxSpeed)) {
                 Block_Speed+=Constants.Ax_FOR_BLOCK;
-                System.out.print(Block_Speed + " ");
                 if (Block_Speed >= Constants.MAX_SPEED_FOR_BLOCK) {
                     MaxSpeed = true;
                 }
                 Check_The_Speed =0;
-            }
+            }*/
 
             if(gameOver) {
                 try{
-                    TimeUnit.SECONDS.sleep(1);
+                    TimeUnit.SECONDS.sleep(2);
                 }catch(Exception e){
                     System.out.print(e);
                 }
                 CHECK_THE_RESTART = true;
             }
+            System.out.print(CHECK_THE_RESTART+" ");
         }
     }
 
@@ -83,15 +74,32 @@ public class Game extends Canvas implements Runnable {
         hero = new Hero(Constants.SPAWN_FOR_HERO, Constants.minY, Constants.Vy_FOR_HERO,Constants.Vx_FOR_TEXTURE,Constants.Ay_FOR_HERO);
         Floor floor = new Floor(Constants.SPAWNx_FOR_FLOOR,Constants.SPAWNy_FOR_FLOOR);
         Queue <Block> blockQueue = new PriorityQueue<Block>();
-        gameOver = false;
-        running = true;
         Block_Speed = Constants.Vx_FOR_TEXTURE;
     }
 
     public void init() {
-        cnt = 0;
-        addKeyListener(new KeyInputHandler());
 
+        addKeyListener(new KeyInputHandler());
+        java.util.Timer timer_for_hero = new java.util.Timer();
+        java.util.Timer timer_for_block = new java.util.Timer();
+        timer_for_hero.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                if (pos++ > 5) {
+                    pos = 1;
+                }
+                if (!Game.CHECK_THE_JUMP) {
+                    Game.hero.image = Game.getSprite("pictures/sprites_8.run" + pos + ".png");
+                }
+            }
+        }, Constants.DIPLAY, Constants.PERIOD);
+
+        timer_for_block.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                blockQueue.add(new Block((int)Constants.SPAWN_FOR_BLOCK, Constants.SPAWNy_FOR_BLOCK, Block_Speed,RG.nextInt(2)));
+            }
+        }, 0, 3000);
     }
 
     public void render() {
@@ -111,7 +119,6 @@ public class Game extends Canvas implements Runnable {
         floor.image.draw(g,floor.getX(),floor.getY());
 
         if(hero != null){
-                img.HeroImages();
                 hero.image.draw(g, hero.getX(), hero.getY());
         }
 
@@ -135,9 +142,9 @@ public class Game extends Canvas implements Runnable {
         }
 
         if(blockQueue != null && !blockQueue.isEmpty() && blockQueue.peek().getX() < -500 )
-            blockQueue.poll();
-        if(blockQueue != null && !blockQueue.isEmpty()) {
-            for(Block block : blockQueue){
+                blockQueue.poll();
+                if(blockQueue != null && !blockQueue.isEmpty()) {
+                    for(Block block : blockQueue){
                 if(block.overlaps(hero)) gameOver = true;
             }
         }
@@ -170,9 +177,9 @@ public class Game extends Canvas implements Runnable {
             }
 
             if (((e.getKeyCode() == KeyEvent.VK_SPACE)) && (CHECK_THE_RESTART)) {
-                restart();
+                gameOver = false;
                 CHECK_THE_RESTART = false;
-
+                restart();
             }
         }
 
