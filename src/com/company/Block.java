@@ -15,9 +15,9 @@ public class Block implements Comparable<Block> {
         this.y = y;
     }
 
-    public void setVx(int x) {
+    public void setVx(int Vx) {
 
-        this.x = x;
+        this.Vx = Vx;
     }
 
 

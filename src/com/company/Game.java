@@ -4,7 +4,6 @@ import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferStrategy;
-import java.awt.image.BufferedImage;
 import java.net.URL;
 import javax.swing.*;
 import java.util.PriorityQueue;
@@ -16,21 +15,25 @@ import java.util.concurrent.TimeUnit;
 public class Game extends Canvas implements Runnable {
 
     private static final long serialVersionUID = 1L;
-    public static Hero hero = new Hero(Constants.SPAWN_FOR_HERO, Constants.minY, Constants.Vy_FOR_HERO, Constants.Ay_FOR_HERO);
+    static Hero hero = new Hero(Constants.SPAWN_FOR_HERO, Constants.minY, Constants.Vy_FOR_HERO,Constants.Vx_FOR_TEXTURE, Constants.Ay_FOR_HERO);
     Animation img = new Animation();
-    Floor floor = new Floor(Constants.SPAWNx_FOR_FLOOR,Constants.SPAWNy_FOR_FLOOR,Constants.Vx_FOR_TEXTURE);
+    Floor floor = new Floor(Constants.SPAWNx_FOR_FLOOR,Constants.SPAWNy_FOR_FLOOR);
     public Queue <Block> blockQueue = new PriorityQueue<Block>();
     Random RG = new Random();
     private boolean running;
     private boolean gameOver;
     private Sprite backgroundImg  = getSprite("pictures/Background.png");
-    public static String NAME = "First Stage";
+    static String NAME = "First Stage";
     private static int cnt ;
-    boolean upPressed = false;
-    boolean CHECK_THE_RESTART = false;
-    public static boolean CHECK_THE_JUMP = false;
-    public  static int cnt1 = 0;
-
+    private boolean upPressed = false;
+    private boolean leftPressed = false;
+    private boolean rightPressed = false;
+    static boolean MaxSpeed = false;
+    private boolean CHECK_THE_RESTART = false;
+    static boolean CHECK_THE_JUMP = false;
+    static int Check_The_Animation = 0;
+    private static int Check_The_Speed = 0;
+    double Block_Speed = Constants.Vx_FOR_TEXTURE;
 
     public void start() {
         running = true;
@@ -48,10 +51,21 @@ public class Game extends Canvas implements Runnable {
             render();
             update((double) delta / Constants.deltaConst);
             cnt++;
+            Check_The_Animation++;
+            Check_The_Speed++;
 
             if (cnt >= Constants.FREQUENCY_FOR_BLOCK) {
                 cnt = 0;
-                blockQueue.add(new Block((int)Constants.SPAWN_FOR_BLOCK, Constants.SPAWNy_FOR_BLOCK, Constants.Vx_FOR_TEXTURE,RG.nextInt(3)));
+                blockQueue.add(new Block((int)Constants.SPAWN_FOR_BLOCK, Constants.SPAWNy_FOR_BLOCK, Block_Speed,RG.nextInt(3)));
+            }
+
+            if ((Check_The_Speed >= 10) && (!MaxSpeed)) {
+                Block_Speed+=Constants.Ax_FOR_BLOCK;
+                System.out.print(Block_Speed + " ");
+                if (Block_Speed >= Constants.MAX_SPEED_FOR_BLOCK) {
+                    MaxSpeed = true;
+                }
+                Check_The_Speed =0;
             }
 
             if(gameOver) {
@@ -66,11 +80,12 @@ public class Game extends Canvas implements Runnable {
     }
 
     private void restart(){
-        hero = new Hero(Constants.SPAWN_FOR_HERO, Constants.minY, Constants.Vy_FOR_HERO, Constants.Ay_FOR_HERO);
-        Floor floor = new Floor(Constants.SPAWNx_FOR_FLOOR,Constants.SPAWNy_FOR_FLOOR,Constants.Vx_FOR_TEXTURE);
+        hero = new Hero(Constants.SPAWN_FOR_HERO, Constants.minY, Constants.Vy_FOR_HERO,Constants.Vx_FOR_TEXTURE,Constants.Ay_FOR_HERO);
+        Floor floor = new Floor(Constants.SPAWNx_FOR_FLOOR,Constants.SPAWNy_FOR_FLOOR);
         Queue <Block> blockQueue = new PriorityQueue<Block>();
         gameOver = false;
         running = true;
+        Block_Speed = Constants.Vx_FOR_TEXTURE;
     }
 
     public void init() {
@@ -93,20 +108,15 @@ public class Game extends Canvas implements Runnable {
         g.fillRect(0,0, getWidth(), getHeight());
         backgroundImg.draw(g,0,0);
 
-        if (floor.getX() <= Constants.FREQUENCY_FOR_FLOOR) {
-            floor = new Floor(Constants.SPAWNx_FOR_FLOOR, Constants.SPAWNy_FOR_FLOOR,Constants.Vx_FOR_TEXTURE);
-        }
-
         floor.image.draw(g,floor.getX(),floor.getY());
 
-        cnt1++;
         if(hero != null){
                 img.HeroImages();
                 hero.image.draw(g, hero.getX(), hero.getY());
         }
 
         for(Block block : blockQueue)
-           block.image.draw(g, block.getX(), block.getY());
+            block.image.draw(g, block.getX(), block.getY());
         g.dispose();
         bs.show();
 
@@ -115,9 +125,16 @@ public class Game extends Canvas implements Runnable {
     public void update(double delta) {
 
         hero.jump(delta);
-        floor.FloorMoving(delta);
 
-        if(blockQueue != null && !blockQueue.isEmpty() && blockQueue.peek().getX() < -200 )
+        if (leftPressed) {
+            Hero.runningLeft(delta);
+        }
+
+        if (rightPressed) {
+            Hero.runningRight(delta);
+        }
+
+        if(blockQueue != null && !blockQueue.isEmpty() && blockQueue.peek().getX() < -500 )
             blockQueue.poll();
         if(blockQueue != null && !blockQueue.isEmpty()) {
             for(Block block : blockQueue){
@@ -144,7 +161,15 @@ public class Game extends Canvas implements Runnable {
                 upPressed = true;
             }
 
-            if (((e.getKeyCode() == KeyEvent.VK_SPACE)) && (CHECK_THE_RESTART == true)) {
+            if (e.getKeyCode() == KeyEvent.VK_LEFT) {
+                leftPressed = true;
+            }
+
+            if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
+                rightPressed = true;
+            }
+
+            if (((e.getKeyCode() == KeyEvent.VK_SPACE)) && (CHECK_THE_RESTART)) {
                 restart();
                 CHECK_THE_RESTART = false;
 
@@ -154,16 +179,17 @@ public class Game extends Canvas implements Runnable {
         public void keyReleased(KeyEvent e) {
             if (e.getKeyCode() == KeyEvent.VK_UP) {
                 if (upPressed)
-                    processUpPressed();
+                    Hero.processUpPressed();
                 upPressed = false;
             }
 
+            if (e.getKeyCode() == KeyEvent.VK_LEFT) {
+                leftPressed = false;
+            }
 
+            if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
+                rightPressed = false;
+            }
         }
-    }
-
-    private void processUpPressed()
-    {
-        hero.setVy(Constants.MAXVy_FOR_HERO);
     }
 }

@@ -7,10 +7,16 @@ public class Hero {
     private int y;
 
     private double Vy;
+    private double Vx;
     private double ay;
+
 
     public void setX(int x) {
         this.x = x;
+    }
+
+    public void setVx(int Vx) {
+        this.Vx = Vx;
     }
 
     public void setY(int y) {
@@ -39,15 +45,20 @@ public class Hero {
         return Vy;
     }
 
+    public double getVx() {
+        return Vx;
+    }
+
     public double getAy() {
         return ay;
     }
 
-    public Hero(int x, int y, double vy, double ay) {
+    public Hero(int x, int y, double vy, double vx,double ay) {
         this.x = x;
         this.y = y;
         Vy = vy;
         this.ay = ay;
+        Vx = vx;
         image = Game.getSprite("pictures/sprites_8.run1.png");
         }
 
@@ -69,5 +80,18 @@ public class Hero {
         }
         if ((y <= Constants.minY) && (y >= Constants.minY-10))
             Game.CHECK_THE_JUMP = false;
+    }
+
+    static void processUpPressed()
+    {
+        Game.hero.setVy(Constants.MAXVy_FOR_HERO);
+    }
+
+    static void runningLeft(double delta) {
+        Game.hero.setX(Game.hero.getX()-(int)(Game.hero.Vx * delta));
+    }
+
+    static void runningRight(double delta) {
+        Game.hero.setX(Game.hero.getX()+(int)(Game.hero.Vx * delta));
     }
 }

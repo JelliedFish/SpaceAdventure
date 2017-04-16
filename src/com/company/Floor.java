@@ -36,16 +36,9 @@ public class Floor {
         }
 
 
-        public Floor(int x, int y, double Vx) {
+        public Floor(int x, int y) {
             this.x = x;
             this.y = y;
-            this.Vx = Vx;
             image = Game.getSprite("pictures/floor.png");
-        }
-
-
-        public void FloorMoving(double delta)
-        {
-            this.x = (int) (this.x - this.Vx * delta);
         }
     }
