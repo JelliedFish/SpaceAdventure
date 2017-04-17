@@ -15,7 +15,7 @@ public abstract class Constants {
      static final double Vy_FOR_HERO = 0.03;
      static final double MAXVy_FOR_HERO = -120;
      static final double Ay_FOR_HERO = 0.1;
-     static final double FREQUENCY_FOR_BLOCK = 250;
+     static final int FREQUENCY_FOR_BLOCK = 3000;
      static final double FREQUENCY_FOR_FLOOR = 0;
      static final double FREQUENCY_FOR_ANIMATION = 15;
      static final double SPAWN_FOR_BLOCK = Constants.WIDTH+10;
@@ -24,7 +24,6 @@ public abstract class Constants {
      static final double MAX_SPEED_FOR_BLOCK = 120;
      static final int PERIOD= 120;
      static final int DIPLAY= 0;
-
-
+     // класс констант
 }
 

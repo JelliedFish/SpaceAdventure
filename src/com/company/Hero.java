@@ -71,7 +71,7 @@ public class Hero {
         }
         y += (int) Vy * delta;
         if (Vy > 20) {
-            image = Game.getSprite("pictures/sprites.jumpUP.png");
+            image = Game.getSprite("pictures/sprites.jumpUP.png"); // анимация прыжка: все подбором (грубо говоря, когда достигает msx точки полета - меняеттся картинка)
             Game.CHECK_THE_JUMP = true;
         }
         if (Vy <-20){

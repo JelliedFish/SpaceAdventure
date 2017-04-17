@@ -1,6 +1,10 @@
 package com.company;
 
 public class Block implements Comparable<Block> {
+    Sprite [] Sarr = new Sprite[] {Game.getSprite("pictures/Block1.png"),
+            Game.getSprite("pictures/Block3.png")
+
+    };
     int x;
     int y;
 
@@ -41,15 +45,8 @@ public class Block implements Comparable<Block> {
         this.x = x;
         this.y = y;
         this.Vx = Vx;
-        switch(height){
-            case 0 : image = Game.getSprite("pictures/Block1.png");
-               break;
-
-            case 1 : image = Game.getSprite("pictures/Block3.png");
-                break;
+        image = Sarr[height];
         }
-
-    }
 
 
     public void BlockMoving(double delta)
@@ -61,11 +58,11 @@ public class Block implements Comparable<Block> {
     @Override
     public int compareTo(Block o) {
         if(o.getX() < this.getX()) return 1;
-        else return -1;
+        else return -1;// здесь все понятно
     }
 
     public boolean overlaps(Hero hero){
         return this.x < (hero.getX() + hero.image.getWidth()-15) && (this.x + this.image.getWidth()-15)  > hero.getX() &&
                             this.y < (hero.getY() + hero.image.getHeight()-15) && (this.y + this.image.getHeight() > hero.getY()-15);
-    }
+    }//процесс соударения
 }

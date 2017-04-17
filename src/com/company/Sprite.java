@@ -26,4 +26,5 @@ public class Sprite {
     {
         g.drawImage(image,x,y,null);
     }
+    //спрайт и кола...
 }
