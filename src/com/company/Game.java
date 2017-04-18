@@ -17,7 +17,8 @@ public class Game extends Canvas implements Runnable { //Класс, в кото
 
     private static final long serialVersionUID = 1L;
     static Hero hero = new Hero(Constants.SPAWN_FOR_HERO, Constants.minY, Constants.Vy_FOR_HERO,Constants.Vx_FOR_TEXTURE, Constants.Ay_FOR_HERO);
-    Floor floor = new Floor(Constants.SPAWNx_FOR_FLOOR,Constants.SPAWNy_FOR_FLOOR);
+    static  double Block_Speed = Constants.Vx_FOR_TEXTURE;
+    Floor floor = new Floor(Constants.SPAWNx_FOR_FLOOR,Constants.SPAWNy_FOR_FLOOR,Block_Speed);
     public Queue <Block> blockQueue = new PriorityQueue<Block>();// Создаем очередь для блоков (платформы, которые перемещаются)
     Random RG = new Random();
     private boolean running; //переменная для главного игрового цикла (всегда true)
@@ -31,8 +32,8 @@ public class Game extends Canvas implements Runnable { //Класс, в кото
     static boolean MaxSpeed = false;
     private boolean CHECK_THE_RESTART = false; //переменная для проверки на использование респауна в игровое время
     static boolean CHECK_THE_JUMP = false;//проверка на прыжок
-    static int Check_The_Speed = 0;
-    double Block_Speed = Constants.Vx_FOR_TEXTURE;
+    static double FREQUENCY_FOR_BLOCK = Constants.FREQUENCY_FOR_BLOCK;
+    int Speed_cnt;
 
     public void start() { // начало игры
         running = true;
@@ -45,19 +46,20 @@ public class Game extends Canvas implements Runnable { //Класс, в кото
         init();//инициализируем
 
         while (running) {
+            Speed_cnt++;
             delta = (System.currentTimeMillis() - lastTime);
             lastTime = System.currentTimeMillis(); // реализация игрового времени
             render();//рисуем
             update((double) delta / Constants.deltaConst);//всякие физические процессы
 
-            /* if ((Check_The_Speed >= 10) && (!MaxSpeed)) {
-                Block_Speed+=Constants.Ax_FOR_BLOCK;
-                if (Block_Speed >= Constants.MAX_SPEED_FOR_BLOCK) {
-                    MaxSpeed = true;
-                }
-                Check_The_Speed =0;
-            }*/
-
+            if (Speed_cnt >= FREQUENCY_FOR_BLOCK) {
+                blockQueue.add(new Block((int)Constants.SPAWN_FOR_BLOCK, Constants.SPAWNy_FOR_BLOCK, Game.Block_Speed,RG.nextInt(2)));
+                Speed_cnt = 0;
+            }
+            if (!MaxSpeed)
+            FREQUENCY_FOR_BLOCK-=0.05;
+            if( FREQUENCY_FOR_BLOCK <= Constants.MAX_FREQUENCY_FOR_BLOCK)
+                MaxSpeed = true;
             if(gameOver) { // что будет, если попал в блок
                 try{
                     TimeUnit.SECONDS.sleep(2);//сон
@@ -66,22 +68,26 @@ public class Game extends Canvas implements Runnable { //Класс, в кото
                 }
                 blockQueue.clear();//подчищаем за оставшимися
                 CHECK_THE_RESTART = true;
+
             }
         }
     }
 
     private void restart(){ //что будет, если попал в блок, но обращаемся сюда после нажатия пробела
-        hero = new Hero(Constants.SPAWN_FOR_HERO, Constants.minY, Constants.Vy_FOR_HERO,Constants.Vx_FOR_TEXTURE,Constants.Ay_FOR_HERO);
-        Floor floor = new Floor(Constants.SPAWNx_FOR_FLOOR,Constants.SPAWNy_FOR_FLOOR);
-        Queue <Block> blockQueue = new PriorityQueue<Block>();
         Block_Speed = Constants.Vx_FOR_TEXTURE;
+        hero = new Hero(Constants.SPAWN_FOR_HERO, Constants.minY, Constants.Vy_FOR_HERO,Constants.Vx_FOR_TEXTURE,Constants.Ay_FOR_HERO);
+        Floor floor = new Floor(Constants.SPAWNx_FOR_FLOOR,Constants.SPAWNy_FOR_FLOOR,Game.Block_Speed);
+        Queue <Block> blockQueue = new PriorityQueue<Block>();
+        MaxSpeed = false;
     }
 
     public void init() {
 
         addKeyListener(new KeyInputHandler());
         java.util.Timer timer_for_hero = new java.util.Timer();
-        java.util.Timer timer_for_block = new java.util.Timer();
+        java.util.Timer timer_for_speed = new java.util.Timer();
+        java.util.Timer timer_for_floor = new java.util.Timer();
+
         timer_for_hero.schedule(new TimerTask() {
             @Override
             public void run() {
@@ -94,12 +100,25 @@ public class Game extends Canvas implements Runnable { //Класс, в кото
             }
         }, Constants.DIPLAY, Constants.PERIOD);
 
-        timer_for_block.schedule(new TimerTask() {
+        timer_for_speed.schedule(new TimerTask() {
             @Override
             public void run() {
-                blockQueue.add(new Block((int)Constants.SPAWN_FOR_BLOCK, Constants.SPAWNy_FOR_BLOCK, Block_Speed,RG.nextInt(2)));
+                if (!MaxSpeed) {
+                    Game.Block_Speed += Constants.Ax_FOR_BLOCK;
+                    if (Game.Block_Speed >= Constants.MAX_SPEED_FOR_BLOCK) {
+                        MaxSpeed = true;
+                    }
+                }
             }
-        }, Constants.DIPLAY, Constants.FREQUENCY_FOR_BLOCK);
+        }, Constants.DIPLAY, Constants.FREQUENCY_FOR_SPEED);
+
+        timer_for_floor.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                    floor.setX(Constants.SPAWNx_FOR_FLOOR);
+                }
+        }, Constants.DIPLAY, Constants.PERIOD_FOR_FLOOR);
+
     }
 // здесь, вроде, все понятно
     public void render() {
@@ -132,6 +151,8 @@ public class Game extends Canvas implements Runnable { //Класс, в кото
     public void update(double delta) {
 
         hero.jump(delta);
+        floor.Floor_Moving(delta);
+        System.out.print(floor.getVx()+" ");
 
         if (leftPressed) {
             Hero.runningLeft(delta); //бег для героя, смотри в классе hero

@@ -16,8 +16,8 @@ public class Floor {
             this.y = y;
         }
 
-        public void setVx(int x) {
-            this.x = x;
+        public void setVx(double Vx) {
+            this.Vx = Vx;
         }
 
 
@@ -36,9 +36,15 @@ public class Floor {
         }
 
 
-        public Floor(int x, int y) {
+        public Floor(int x, int y, double Vx) {
             this.x = x;
             this.y = y;
-            image = Game.getSprite("pictures/floor.png");
+            this.Vx = Vx;
+            image = Game.getSprite("pictures/floor1.png");
+        }
+
+        public void Floor_Moving(double delta) {
+            this.setVx(Game.Block_Speed);
+            this.x = (int) (this.x - this.Vx*delta);
         }
     }
