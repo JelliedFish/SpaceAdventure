@@ -18,7 +18,8 @@ public class Game extends Canvas implements Runnable { //Класс, в кото
     private static final long serialVersionUID = 1L;
     static Hero hero = new Hero(Constants.SPAWN_FOR_HERO, Constants.minY, Constants.Vy_FOR_HERO,Constants.Vx_FOR_TEXTURE, Constants.Ay_FOR_HERO);
     static  double Block_Speed = Constants.Vx_FOR_TEXTURE;
-    Floor floor = new Floor(Constants.SPAWNx_FOR_FLOOR,Constants.SPAWNy_FOR_FLOOR,Block_Speed);
+    Floor floor1 = new Floor(Constants.SPAWNx_FOR_FLOOR,Constants.SPAWNy_FOR_FLOOR,Block_Speed);
+    Floor floor2 = new Floor(Constants.SPAWNx_FOR_FLOOR,Constants.SPAWNy_FOR_FLOOR,Block_Speed);
     public Queue <Block> blockQueue = new PriorityQueue<Block>();// Создаем очередь для блоков (платформы, которые перемещаются)
     Random RG = new Random();
     private boolean running; //переменная для главного игрового цикла (всегда true)
@@ -53,7 +54,7 @@ public class Game extends Canvas implements Runnable { //Класс, в кото
             update((double) delta / Constants.deltaConst);//всякие физические процессы
 
             if (Speed_cnt >= FREQUENCY_FOR_BLOCK) {
-                blockQueue.add(new Block((int)Constants.SPAWN_FOR_BLOCK, Constants.SPAWNy_FOR_BLOCK, Game.Block_Speed,RG.nextInt(2)));
+                blockQueue.add(new Block((int)Constants.SPAWN_FOR_BLOCK, Constants.IMIN + RG.nextInt((Constants.IMAX-Constants.IMIN)/Constants.w)*Constants.w, Game.Block_Speed,RG.nextInt(2)));
                 Speed_cnt = 0;
             }
             if (!MaxSpeed)
@@ -86,7 +87,8 @@ public class Game extends Canvas implements Runnable { //Класс, в кото
         addKeyListener(new KeyInputHandler());
         java.util.Timer timer_for_hero = new java.util.Timer();
         java.util.Timer timer_for_speed = new java.util.Timer();
-        java.util.Timer timer_for_floor = new java.util.Timer();
+        java.util.Timer timer_for_floor1 = new java.util.Timer();
+        java.util.Timer timer_for_floor2 = new java.util.Timer();
 
         timer_for_hero.schedule(new TimerTask() {
             @Override
@@ -112,12 +114,20 @@ public class Game extends Canvas implements Runnable { //Класс, в кото
             }
         }, Constants.DIPLAY, Constants.FREQUENCY_FOR_SPEED);
 
-        timer_for_floor.schedule(new TimerTask() {
+        timer_for_floor1.schedule(new TimerTask() {
             @Override
             public void run() {
-                    floor.setX(Constants.SPAWNx_FOR_FLOOR);
+                    floor1.setX(Constants.SPAWNx_FOR_FLOOR);
                 }
-        }, Constants.DIPLAY, Constants.PERIOD_FOR_FLOOR);
+        }, Constants.DIPLAY, Constants.PERIOD_FOR_FLOOR1);
+
+        timer_for_floor2.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                floor2.setX(Constants.SPAWNx_FOR_FLOOR);
+            }
+        }, Constants.DIPLAY, Constants.PERIOD_FOR_FLOOR2);
+
 
     }
 // здесь, вроде, все понятно
@@ -135,7 +145,7 @@ public class Game extends Canvas implements Runnable { //Класс, в кото
         g.fillRect(0,0, getWidth(), getHeight());
         backgroundImg.draw(g,0,0);
 
-        floor.image.draw(g,floor.getX(),floor.getY());
+        floor1.image.draw(g,floor1.getX(),floor1.getY());
 
         if(hero != null){
                 hero.image.draw(g, hero.getX(), hero.getY());
@@ -150,9 +160,15 @@ public class Game extends Canvas implements Runnable { //Класс, в кото
 
     public void update(double delta) {
 
-        hero.jump(delta);
-        floor.Floor_Moving(delta);
-        System.out.print(floor.getVx()+" ");
+        if (upPressed)
+            hero.jump(delta);
+        if(!upPressed)
+            hero.down(delta);
+        hero.processUpPressed();
+
+        floor1.Floor_Moving(delta);
+        floor2.Floor_Moving(delta);
+
 
         if (leftPressed) {
             Hero.runningLeft(delta); //бег для героя, смотри в классе hero
@@ -185,7 +201,7 @@ public class Game extends Canvas implements Runnable { //Класс, в кото
 
         public void keyPressed(KeyEvent e) {
 
-            if ((e.getKeyCode() == KeyEvent.VK_UP) && (hero.getY() >= Constants.minY - 1)) {
+            if (e.getKeyCode() == KeyEvent.VK_UP)  {
                 upPressed = true;
             }
 
@@ -206,8 +222,6 @@ public class Game extends Canvas implements Runnable { //Класс, в кото
 
         public void keyReleased(KeyEvent e) {
             if (e.getKeyCode() == KeyEvent.VK_UP) {
-                if (upPressed)
-                    Hero.processUpPressed();
                 upPressed = false;
             }
 

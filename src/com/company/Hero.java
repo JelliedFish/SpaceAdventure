@@ -70,6 +70,27 @@ public class Hero {
             Vy += Constants.ACC * delta;
         }
         y += (int) Vy * delta;
+
+        if ((y <= Constants.minY) && (y >= Constants.minY-10))
+            Game.CHECK_THE_JUMP = false;
+    }
+
+    public void down(double delta) {
+        if (y > Constants.minY) {
+            Vy = 0;
+            y = Constants.minY;
+        } else {
+            Vy += Constants.ACC1 * delta;
+        }
+        y += (int) Vy * delta;
+
+        if ((y <= Constants.minY) && (y >= Constants.minY-10))
+            Game.CHECK_THE_JUMP = false;
+    }
+
+
+    public void processUpPressed()
+    {
         if (Vy > 20) {
             image = Game.getSprite("pictures/sprites.jumpUP.png"); // анимация прыжка: все подбором (грубо говоря, когда достигает msx точки полета - меняеттся картинка)
             Game.CHECK_THE_JUMP = true;
@@ -78,13 +99,6 @@ public class Hero {
             image = Game.getSprite("pictures/sprites.jumpDOWN.png");
             Game.CHECK_THE_JUMP = true;
         }
-        if ((y <= Constants.minY) && (y >= Constants.minY-10))
-            Game.CHECK_THE_JUMP = false;
-    }
-
-    static void processUpPressed()
-    {
-        Game.hero.setVy(Constants.MAXVy_FOR_HERO);
     }
 
     static void runningLeft(double delta) {
