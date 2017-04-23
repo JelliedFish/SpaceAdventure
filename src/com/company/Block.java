@@ -13,7 +13,7 @@ public class Block implements Comparable<Block> {
     public void setX(int x) {
         this.x = x;
     }
-
+ 
     public void setY(int y)
     {
         this.y = y;
@@ -25,7 +25,7 @@ public class Block implements Comparable<Block> {
     }
 
 
-    public static Sprite image;
+     Sprite image;
 
     public int getX() {
         return x;
@@ -45,7 +45,7 @@ public class Block implements Comparable<Block> {
         this.x = x;
         this.y = y;
         this.Vx = Vx;
-        image = Sarr[height];
+        this.image = Sarr[height];
         }
 
 
@@ -62,7 +62,12 @@ public class Block implements Comparable<Block> {
     }
 
     public boolean overlaps(Hero hero){
-        return this.x < (hero.getX() + hero.image.getWidth()-15) && (this.x + this.image.getWidth()-15)  > hero.getX() &&
-                            this.y < (hero.getY() + hero.image.getHeight()-15) && (this.y + this.image.getHeight() > hero.getY()-15);
+         if (this.x < hero.getX())
+        return (this.x < hero.getX() + hero.image.getWidth()-15) && (this.x + this.image.getWidth()-15)  > hero.getX() &&
+                this.y < (hero.getY() + hero.image.getHeight()-10) && (this.y + this.image.getHeight() > hero.getY()-10);
+        else
+            return (this.x < hero.getX() + hero.image.getWidth()-15) && (this.x + this.image.getWidth()-15)  > hero.getX() &&
+                    this.y < (hero.getY() + hero.image.getHeight()+10) && (this.y + this.image.getHeight() > hero.getY()+10);
+
     }//процесс соударения
 }

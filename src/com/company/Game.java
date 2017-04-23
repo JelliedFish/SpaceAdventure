@@ -57,20 +57,23 @@ public class Game extends Canvas implements Runnable { //Класс, в кото
                 blockQueue.add(new Block((int)Constants.SPAWN_FOR_BLOCK, Constants.IMIN + RG.nextInt((Constants.IMAX-Constants.IMIN)/Constants.w)*Constants.w, Game.Block_Speed,RG.nextInt(2)));
                 Speed_cnt = 0;
             }
+
             if (!MaxSpeed)
             FREQUENCY_FOR_BLOCK-=0.05;
             if( FREQUENCY_FOR_BLOCK <= Constants.MAX_FREQUENCY_FOR_BLOCK)
                 MaxSpeed = true;
+
+
             if(gameOver) { // что будет, если попал в блок
+                CHECK_THE_RESTART = true;
                 try{
                     TimeUnit.SECONDS.sleep(2);//сон
                 }catch(Exception e){
                     System.out.print(e);
                 }
                 blockQueue.clear();//подчищаем за оставшимися
-                CHECK_THE_RESTART = true;
-
             }
+
         }
     }
 
