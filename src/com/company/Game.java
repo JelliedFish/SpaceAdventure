@@ -16,15 +16,15 @@ import java.util.concurrent.TimeUnit;
 public class Game extends Canvas implements Runnable { //Класс, в котором происходят все игровые манипуляции:
 
     private static final long serialVersionUID = 1L;
-    static Hero hero = new Hero(Constants.SPAWN_FOR_HERO, Constants.minY, Constants.Vy_FOR_HERO,Constants.Vx_FOR_TEXTURE, Constants.Ay_FOR_HERO);
-    static  double Block_Speed = Constants.Vx_FOR_TEXTURE;
-    Floor floor1 = new Floor(Constants.SPAWNx_FOR_FLOOR,Constants.SPAWNy_FOR_FLOOR,Block_Speed);
-    Floor floor2 = new Floor(Constants.SPAWNx_FOR_FLOOR,Constants.SPAWNy_FOR_FLOOR,Block_Speed);
-    public Queue <Block> blockQueue = new PriorityQueue<Block>();// Создаем очередь для блоков (платформы, которые перемещаются)
+    static Hero hero = new Hero(Constants.SPAWN_FOR_HERO, Constants.minY, Constants.Vy_FOR_HERO, Constants.Vx_FOR_TEXTURE, Constants.Ay_FOR_HERO);
+    static double Block_Speed = Constants.Vx_FOR_TEXTURE;
+    Floor floor1 = new Floor(Constants.SPAWNx_FOR_FLOOR, Constants.SPAWNy_FOR_FLOOR, Block_Speed);
+    Floor floor2 = new Floor(Constants.SPAWNx_FOR_FLOOR, Constants.SPAWNy_FOR_FLOOR, Block_Speed);
+    public Queue<Block> blockQueue = new PriorityQueue<Block>();// Создаем очередь для блоков (платформы, которые перемещаются)
     Random RG = new Random();
     private boolean running; //переменная для главного игрового цикла (всегда true)
     private boolean gameOver; // флаг для остановк игры после соприкосновения с блоком
-    private Sprite backgroundImg  = getSprite("pictures/Background.png");// background
+    private Sprite backgroundImg = getSprite("pictures/Background.png");// background
     static String NAME = "First Stage";
     int pos;//счетчик для регулировки индексов картинки sprites_8.run + pos + ...
     private boolean upPressed = false;
@@ -41,7 +41,7 @@ public class Game extends Canvas implements Runnable { //Класс, в кото
         new Thread(this).start();
     }
 
-    public void run(){
+    public void run() {
         long delta;
         long lastTime = System.currentTimeMillis();
         init();//инициализируем
@@ -54,21 +54,21 @@ public class Game extends Canvas implements Runnable { //Класс, в кото
             update((double) delta / Constants.deltaConst);//всякие физические процессы
 
             if (Speed_cnt >= FREQUENCY_FOR_BLOCK) {
-                blockQueue.add(new Block((int)Constants.SPAWN_FOR_BLOCK, Constants.IMIN + RG.nextInt((Constants.IMAX-Constants.IMIN)/Constants.w)*Constants.w, Game.Block_Speed,RG.nextInt(2)));
+                blockQueue.add(new Block((int) Constants.SPAWN_FOR_BLOCK, Constants.IMIN + RG.nextInt((Constants.IMAX - Constants.IMIN) / Constants.w) * Constants.w, Game.Block_Speed, RG.nextInt(2)));
                 Speed_cnt = 0;
             }
 
             if (!MaxSpeed)
-            FREQUENCY_FOR_BLOCK-=0.05;
-            if( FREQUENCY_FOR_BLOCK <= Constants.MAX_FREQUENCY_FOR_BLOCK)
+                FREQUENCY_FOR_BLOCK -= 0.05;
+            if (FREQUENCY_FOR_BLOCK <= Constants.MAX_FREQUENCY_FOR_BLOCK)
                 MaxSpeed = true;
 
 
-            if(gameOver) { // что будет, если попал в блок
+            if (gameOver) { // что будет, если попал в блок
                 CHECK_THE_RESTART = true;
-                try{
+                try {
                     TimeUnit.SECONDS.sleep(2);//сон
-                }catch(Exception e){
+                } catch (Exception e) {
                     System.out.print(e);
                 }
                 blockQueue.clear();//подчищаем за оставшимися
@@ -77,12 +77,13 @@ public class Game extends Canvas implements Runnable { //Класс, в кото
         }
     }
 
-    private void restart(){ //что будет, если попал в блок, но обращаемся сюда после нажатия пробела
+    private void restart() { //что будет, если попал в блок, но обращаемся сюда после нажатия пробела
         Block_Speed = Constants.Vx_FOR_TEXTURE;
-        hero = new Hero(Constants.SPAWN_FOR_HERO, Constants.minY, Constants.Vy_FOR_HERO,Constants.Vx_FOR_TEXTURE,Constants.Ay_FOR_HERO);
-        Floor floor = new Floor(Constants.SPAWNx_FOR_FLOOR,Constants.SPAWNy_FOR_FLOOR,Game.Block_Speed);
-        Queue <Block> blockQueue = new PriorityQueue<Block>();
+        hero = new Hero(Constants.SPAWN_FOR_HERO, Constants.minY, Constants.Vy_FOR_HERO, Constants.Vx_FOR_TEXTURE, Constants.Ay_FOR_HERO);
+        Floor floor = new Floor(Constants.SPAWNx_FOR_FLOOR, Constants.SPAWNy_FOR_FLOOR, Game.Block_Speed);
+        Queue<Block> blockQueue = new PriorityQueue<Block>();
         MaxSpeed = false;
+        Hero.CHECK_THE_OVERLAPS = false;
     }
 
     public void init() {
@@ -120,8 +121,8 @@ public class Game extends Canvas implements Runnable { //Класс, в кото
         timer_for_floor1.schedule(new TimerTask() {
             @Override
             public void run() {
-                    floor1.setX(Constants.SPAWNx_FOR_FLOOR);
-                }
+                floor1.setX(Constants.SPAWNx_FOR_FLOOR);
+            }
         }, Constants.DIPLAY, Constants.PERIOD_FOR_FLOOR1);
 
         timer_for_floor2.schedule(new TimerTask() {
@@ -133,7 +134,8 @@ public class Game extends Canvas implements Runnable { //Класс, в кото
 
 
     }
-// здесь, вроде, все понятно
+
+    // здесь, вроде, все понятно
     public void render() {
         BufferStrategy bs = getBufferStrategy();
         if (bs == null) {
@@ -145,16 +147,16 @@ public class Game extends Canvas implements Runnable { //Класс, в кото
         Graphics g = bs.getDrawGraphics();
         g.setColor(Color.black);
         g.setColor(Color.black);
-        g.fillRect(0,0, getWidth(), getHeight());
-        backgroundImg.draw(g,0,0);
+        g.fillRect(0, 0, getWidth(), getHeight());
+        backgroundImg.draw(g, 0, 0);
 
-        floor1.image.draw(g,floor1.getX(),floor1.getY());
+        floor1.image.draw(g, floor1.getX(), floor1.getY());
 
-        if(hero != null){
-                hero.image.draw(g, hero.getX(), hero.getY());
+        if (hero != null) {
+            hero.image.draw(g, hero.getX(), hero.getY());
         }
 
-        for(Block block : blockQueue)
+        for (Block block : blockQueue)
             block.image.draw(g, block.getX(), block.getY());
         g.dispose();
         bs.show();
@@ -163,33 +165,42 @@ public class Game extends Canvas implements Runnable { //Класс, в кото
 
     public void update(double delta) {
 
-        if (upPressed)
-            hero.jump(delta);
-        if(!upPressed)
-            hero.down(delta);
-        hero.processUpPressed();
+        hero.processJump();
 
-        floor1.Floor_Moving(delta);
-        floor2.Floor_Moving(delta);
+        if (hero.processOverlaps()){
+            gameOver = true;
+
+        }else {
+
+            if (upPressed)
+                hero.jump(delta);
+            if (!upPressed)
+                hero.down(delta);
+            hero.processUpPressed();
 
 
-        if (leftPressed) {
-            Hero.runningLeft(delta); //бег для героя, смотри в классе hero
-        }
+            floor1.Floor_Moving(delta);
+            floor2.Floor_Moving(delta);
 
-        if (rightPressed) {
-            Hero.runningRight(delta);
-        }
 
-        if(blockQueue != null && !blockQueue.isEmpty() && blockQueue.peek().getX() < -500 )
-                blockQueue.poll();
-                if(blockQueue != null && !blockQueue.isEmpty()) {
-                    for(Block block : blockQueue){
-                if(block.overlaps(hero)) gameOver = true; //чистим очередь
+            if (leftPressed) {
+                Hero.runningLeft(delta); //бег для героя, смотри в классе hero
             }
-        }
-        for(Block block : blockQueue) block.BlockMoving(delta); //движение блоков, смотри в классе block
 
+            if (rightPressed) {
+                Hero.runningRight(delta);
+            }
+
+            if (blockQueue != null && !blockQueue.isEmpty() && blockQueue.peek().getX() < -500)
+                blockQueue.poll();
+            if (blockQueue != null && !blockQueue.isEmpty()) {
+                for (Block block : blockQueue) {
+                    if (block.overlaps(hero)) gameOver = true;
+                }
+            }
+            for (Block block : blockQueue) block.BlockMoving(delta); //движение блоков, смотри в классе block
+
+        }
     }
 
     public static Sprite getSprite(String path) {
@@ -204,7 +215,7 @@ public class Game extends Canvas implements Runnable { //Класс, в кото
 
         public void keyPressed(KeyEvent e) {
 
-            if (e.getKeyCode() == KeyEvent.VK_UP)  {
+            if (e.getKeyCode() == KeyEvent.VK_UP) {
                 upPressed = true;
             }
 

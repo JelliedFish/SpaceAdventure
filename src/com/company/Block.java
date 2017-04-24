@@ -62,12 +62,14 @@ public class Block implements Comparable<Block> {
     }
 
     public boolean overlaps(Hero hero){
+        boolean b;
          if (this.x < hero.getX())
-        return (this.x < hero.getX() + hero.image.getWidth()-15) && (this.x + this.image.getWidth()-15)  > hero.getX() &&
+        b =(this.x < hero.getX() + hero.image.getWidth()-15) && (this.x + this.image.getWidth()-15)  > hero.getX() &&
                 this.y < (hero.getY() + hero.image.getHeight()-10) && (this.y + this.image.getHeight() > hero.getY()-10);
         else
-            return (this.x < hero.getX() + hero.image.getWidth()-15) && (this.x + this.image.getWidth()-15)  > hero.getX() &&
+            b =  (this.x < hero.getX() + hero.image.getWidth()-15) && (this.x + this.image.getWidth()-15)  > hero.getX() &&
                     this.y < (hero.getY() + hero.image.getHeight()+10) && (this.y + this.image.getHeight() > hero.getY()+10);
+         return b;
 
     }//процесс соударения
 }

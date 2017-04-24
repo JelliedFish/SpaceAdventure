@@ -3,6 +3,7 @@ package com.company;
 public class Hero {
 
     public Sprite image ;
+    static boolean CHECK_THE_OVERLAPS = false;
     private int x;
     private int y;
 
@@ -82,6 +83,7 @@ public class Hero {
         } else {
             Vy += Constants.ACC1 * delta;
         }
+
         y += (int) Vy * delta;
 
         if ((y <= Constants.minY) && (y >= Constants.minY-10))
@@ -98,6 +100,19 @@ public class Hero {
         if (Vy <-20){
             image = Game.getSprite("pictures/sprites.jumpDOWN.png");
             Game.CHECK_THE_JUMP = true;
+        }
+    }
+
+    public boolean processOverlaps() {
+        if ((this.x <= 10) || (this.x >= Constants.WIDTH - 50))
+            Hero.CHECK_THE_OVERLAPS = true;
+
+        return Hero.CHECK_THE_OVERLAPS;
+    }
+
+    public void processJump() {
+        if (y <=0) {
+            this.Vy = 10;
         }
     }
 
