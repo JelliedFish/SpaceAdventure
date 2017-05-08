@@ -8,8 +8,11 @@ public class Sprite {
     private Image image;
 
     public Sprite(Image image) {
-
         this.image = image;
+    }
+
+    void draw_with_size (Graphics g,int x,int y, int x1, int y1){
+        g.drawImage(image,x,y,x1,y1,null);
     }
 
     public int getWidth() {

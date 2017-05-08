@@ -1,7 +1,5 @@
 package com.company;
 
-import com.company.MyRect;
-
 import javax.swing.*;
 import java.awt.*;
 import java.net.URL;
@@ -15,11 +13,11 @@ public class ButtonImage {
     private Image imageClicked;
     private Image imageEntered;
     public ButtonImage(String image,String imageClicked,String imageEntered){
-        URL imgURL = MyRect.class.getResource(image);
+        URL imgURL = Block.class.getResource(image);
         this.image = new ImageIcon(imgURL).getImage();
-        imgURL = MyRect.class.getResource(imageClicked);
+        imgURL =Block.class.getResource(imageClicked);
         this.imageClicked = new ImageIcon(imgURL).getImage();
-        imgURL = MyRect.class.getResource(imageEntered);
+        imgURL = Block.class.getResource(imageEntered);
         this.imageEntered = new ImageIcon(imgURL).getImage();
     }
     public Image getImage(){

@@ -1,14 +1,11 @@
 package com.company;
 
-import com.company.pictures.ButtonImage;
 
 import javax.swing.*;
 import java.awt.*;
 
-    /**
-     * Created by nurgalievar.18 on 17.04.2017.
-     */
-    public class Button extends JPanel{
+
+public class Button extends JPanel{
         int x;
         int y;
         int k=0;//если при нажатии на кнопку нужно увеличивать какой-то счетчик

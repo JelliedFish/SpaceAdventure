@@ -1,10 +1,11 @@
 package com.company;
 
 public class Block implements Comparable<Block> {
-    Sprite [] Sarr = new Sprite[] {Game.getSprite("pictures/Block1.png"),
-            Game.getSprite("pictures/Block3.png")
 
-    };
+    Sprite [] Sarr = new Sprite[] {Game.getSprite("pictures/The Block1.png"),
+            Game.getSprite("pictures/The Block2.png"),Game.getSprite("pictures/The Block3.png"),Game.getSprite("pictures/The Block4.png"),Game.getSprite("pictures/The Block5.png"),Game.getSprite("pictures/The Block6.png"),
+            Game.getSprite("pictures/The Block7.png"),Game.getSprite("pictures/The Block8.png"),Game.getSprite("pictures/The Block9.png"),Game.getSprite("pictures/The Block10.png"),Game.getSprite("pictures/The Block11.png"),
+            Game.getSprite("pictures/The Block12.png"),Game.getSprite("pictures/The Block13.png")};
     int x;
     int y;
 
@@ -41,11 +42,11 @@ public class Block implements Comparable<Block> {
     }
 
 
-    public Block(int x, int y, double Vx, int height) {
+    public Block(int x, int y, double Vx, int cnt) {
         this.x = x;
         this.y = y;
         this.Vx = Vx;
-        this.image = Sarr[height];
+        this.image = Sarr[cnt];
         }
 
 
@@ -64,11 +65,11 @@ public class Block implements Comparable<Block> {
     public boolean overlaps(Hero hero){
         boolean b;
          if (this.x < hero.getX())
-        b =(this.x < hero.getX() + hero.image.getWidth()-15) && (this.x + this.image.getWidth()-15)  > hero.getX() &&
-                this.y < (hero.getY() + hero.image.getHeight()-10) && (this.y + this.image.getHeight() > hero.getY()-10);
+        b =(this.x+50 < hero.getX() + hero.image.getWidth()) && (this.x + this.image.getWidth())  > hero.getX() &&
+                this.y +35 < (hero.getY() + hero.image.getHeight()) && (this.y + this.image.getHeight()-20 > hero.getY()+hero.image.getHeight());
         else
-            b =  (this.x < hero.getX() + hero.image.getWidth()-15) && (this.x + this.image.getWidth()-15)  > hero.getX() &&
-                    this.y < (hero.getY() + hero.image.getHeight()+10) && (this.y + this.image.getHeight() > hero.getY()+10);
+            b =  (this.x+27 < hero.getX() + hero.image.getWidth()) && (this.x + this.image.getWidth())  > hero.getX() &&
+                    this.y+35 < (hero.getY() + hero.image.getHeight()) && (this.y + this.image.getHeight()-20 > hero.getY());
          return b;
 
     }//процесс соударения
