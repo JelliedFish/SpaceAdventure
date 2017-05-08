@@ -42,10 +42,6 @@ public class Game extends Canvas implements Runnable { //Класс, в кото
     int points_cnt = 0;
     String points = String.valueOf(points_cnt);
     static int TheRecord = 0;
-    static int TheRecord1 = 0;
-
-
-
 
     public void start() { // начало игры
         running = true;
