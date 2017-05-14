@@ -2,12 +2,10 @@ package com.company;
 
 public class Block implements Comparable<Block> {
 
-    Sprite [] Sarr = new Sprite[] {Game.getSprite("pictures/The Block1.png"),
-            Game.getSprite("pictures/The Block2.png"),Game.getSprite("pictures/The Block3.png"),Game.getSprite("pictures/The Block4.png"),Game.getSprite("pictures/The Block5.png"),Game.getSprite("pictures/The Block6.png"),
-            Game.getSprite("pictures/The Block7.png"),Game.getSprite("pictures/The Block8.png"),Game.getSprite("pictures/The Block9.png"),Game.getSprite("pictures/The Block10.png"),Game.getSprite("pictures/The Block11.png"),
-            Game.getSprite("pictures/The Block12.png"),Game.getSprite("pictures/The Block13.png")};
     int x;
     int y;
+    Sprite image;
+
 
     double Vx;
 
@@ -25,9 +23,6 @@ public class Block implements Comparable<Block> {
         this.Vx = Vx;
     }
 
-
-     Sprite image;
-
     public int getX() {
         return x;
     }
@@ -42,11 +37,11 @@ public class Block implements Comparable<Block> {
     }
 
 
-    public Block(int x, int y, double Vx, int cnt) {
+    public Block(int x, int y, double Vx) {
         this.x = x;
         this.y = y;
         this.Vx = Vx;
-        this.image = Sarr[cnt];
+        this.image = Game.getSprite("pictures/The Block1.png");
         }
 
 
@@ -54,7 +49,6 @@ public class Block implements Comparable<Block> {
     {
         this.x = (int) (this.x - this.Vx*delta);
     }
-
 
     @Override
     public int compareTo(Block o) {

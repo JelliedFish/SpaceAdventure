@@ -4,10 +4,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.net.URL;
 
-/**
- * Created by nurgalievar.18 on 17.04.2017.
- */
-
 public class ButtonImage {
     private Image image;
     private Image imageClicked;

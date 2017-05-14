@@ -104,7 +104,7 @@ public class Hero {
     }
 
     public boolean processOverlaps() {
-        if ((this.x <= 10) || (this.x >= Constants.WIDTH - 50))
+        if (this.x <= 10)
             Hero.CHECK_THE_OVERLAPS = true;
 
         return Hero.CHECK_THE_OVERLAPS;
@@ -113,6 +113,12 @@ public class Hero {
     public void processJump() {
         if (y <=0) {
             this.Vy = 10;
+        }
+    }
+
+    public void processLeft() {
+        if (x >=Constants.WIDTH-50) {
+            this.x = Constants.WIDTH-50 ;
         }
     }
 

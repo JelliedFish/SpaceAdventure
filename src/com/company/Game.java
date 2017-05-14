@@ -18,30 +18,33 @@ import java.util.concurrent.TimeUnit;
 public class Game extends Canvas implements Runnable { //Класс, в котором происходят все игровые манипуляции:
 
     private static final long serialVersionUID = 1L;
+    Laser laser = new Laser(0,-27);
     static Hero hero = new Hero(Constants.SPAWN_FOR_HERO, Constants.minY, Constants.Vy_FOR_HERO, Constants.Vx_FOR_TEXTURE, Constants.Ay_FOR_HERO);
     static double Block_Speed = Constants.Vx_FOR_TEXTURE;
-    Floor floor1 = new Floor(Constants.SPAWNx_FOR_FLOOR, Constants.SPAWNy_FOR_FLOOR, Block_Speed);
-    Floor floor2 = new Floor(Constants.SPAWNx_FOR_FLOOR, Constants.SPAWNy_FOR_FLOOR, Block_Speed);
-    public Queue<Block> blockQueue = new PriorityQueue<Block>();// Создаем очередь для блоков (платформы, которые перемещаются)
-    Random RG = new Random();
+    private Floor floor1 = new Floor(Constants.SPAWNx_FOR_FLOOR, Constants.SPAWNy_FOR_FLOOR, Block_Speed);
+    private Floor floor2 = new Floor(Constants.SPAWNx_FOR_FLOOR, Constants.SPAWNy_FOR_FLOOR, Block_Speed);
+    private Queue<Block> blockQueue = new PriorityQueue<Block>();// Создаем очередь для блоков (платформы, которые перемещаются)
+    private Random RG = new Random();
     static boolean running; //переменная для главного игрового цикла (всегда true)
     static boolean gameOver; // флаг для остановк игры после соприкосновения с блоком
     private Sprite backgroundImg = getSprite("pictures/Background.png");// background
     static String NAME = "First Stage";
-    int pos;//счетчик для регулировки индексов картинки sprites_8.run + pos + ...
+    private int pos;//счетчик для регулировки индексов картинки sprites_8.run + pos + ...
     private boolean upPressed = false;
     private boolean leftPressed = false;
     private boolean rightPressed = false;
-    static boolean MaxSpeed = false;
+    private boolean MaxSpeed = false;
+    private boolean MaxSpeed_Frequency = false;
     private boolean CHECK_THE_RESTART = false; //переменная для проверки на использование респауна в игровое время
     static boolean CHECK_THE_JUMP = false;//проверка на прыжок
-    static double FREQUENCY_FOR_BLOCK = Constants.FREQUENCY_FOR_BLOCK;
-    int Speed_cnt;
-    static int cnt = 1;
-    static int cnt1 = 1;
-    int points_cnt = 0;
-    String points = String.valueOf(points_cnt);
-    static int TheRecord = 0;
+    private double FREQUENCY_FOR_BLOCK = Constants.FREQUENCY_FOR_BLOCK;
+    private int Speed_cnt;
+    private int cnt = 1;
+    private int cnt1 = 1;
+    private  int cnt2 = 1;
+    private int points_cnt = 0;
+    private int TheRecord = 0;
+    static  boolean trouble = false;
 
     public void start() { // начало игры
         running = true;
@@ -60,21 +63,20 @@ public class Game extends Canvas implements Runnable { //Класс, в кото
             update((double) delta / Constants.deltaConst);//всякие физические процессы
 
             if (Speed_cnt >= FREQUENCY_FOR_BLOCK) {
-                blockQueue.add(new Block((int) Constants.SPAWN_FOR_BLOCK, Constants.IMIN + RG.nextInt((Constants.IMAX - Constants.IMIN) / Constants.w) * Constants.w, Game.Block_Speed, RG.nextInt(12)));
+                blockQueue.add(new Block((int) Constants.SPAWN_FOR_BLOCK, Constants.IMIN + RG.nextInt((Constants.IMAX - Constants.IMIN) / Constants.w) * Constants.w, Game.Block_Speed));
                 Speed_cnt = 0;
             }
 
-            if (!MaxSpeed)
+            if (!MaxSpeed_Frequency)
                 FREQUENCY_FOR_BLOCK -= 0.05;
             if (FREQUENCY_FOR_BLOCK <= Constants.MAX_FREQUENCY_FOR_BLOCK)
-                MaxSpeed = true;
+                MaxSpeed_Frequency = true;
 
 
             if (gameOver) { // что будет, если попал в блок
                 CHECK_THE_RESTART = true;
                 render();
                 blockQueue.clear();//подчищаем за оставшимися
-                System.out.println("Your record is:"+TheRecord);
             }
         }
     }
@@ -88,6 +90,9 @@ public class Game extends Canvas implements Runnable { //Класс, в кото
         MaxSpeed = false;
         Hero.CHECK_THE_OVERLAPS = false;
         FREQUENCY_FOR_BLOCK = Constants.FREQUENCY_FOR_BLOCK;
+        points_cnt = 0;
+        floor1.setVx(Constants.Vx_FOR_TEXTURE);
+        floor2.setVx(Constants.Vx_FOR_TEXTURE);
     }
 
     public void init() {
@@ -99,6 +104,19 @@ public class Game extends Canvas implements Runnable { //Класс, в кото
         java.util.Timer timer_for_floor2 = new java.util.Timer();
         java.util.Timer timer_for_Block1 = new java.util.Timer();
         java.util.Timer timer_for_Boom = new java.util.Timer();
+        java.util.Timer timer_for_Laser = new java.util.Timer();
+
+
+        timer_for_Laser.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                cnt2++;
+                if (cnt2 > 4) {
+                    cnt2 = 1;
+                }
+                laser.image = Game.getSprite("pictures/Lasers_sprites"+cnt2+".png" );
+            }
+        }, Constants.DIPLAY, 200);
 
 
         timer_for_hero.schedule(new TimerTask() {
@@ -116,9 +134,12 @@ public class Game extends Canvas implements Runnable { //Класс, в кото
         timer_for_Block1.schedule(new TimerTask() {
             @Override
             public void run() {
-                if (cnt++ > 12)
-                    cnt = 1;
-                points_cnt++;
+                if (!gameOver) {
+
+                    if (cnt++ > 12)
+                        cnt = 1;
+                    points_cnt++;
+                }
             }
         }, Constants.DIPLAY, Constants.PERIOD_FOR_BLOCK);
 
@@ -126,8 +147,8 @@ public class Game extends Canvas implements Runnable { //Класс, в кото
             @Override
             public void run() {
                 if (gameOver) {
-                    if (cnt1++ > 9)
-                        cnt1 = 1;
+                    if (cnt1++ >= 9)
+                        cnt1 = 9;
                     Game.hero.image = Game.getSprite("pictures/boom " + cnt1 + ".png");
                 }
             }
@@ -148,15 +169,15 @@ public class Game extends Canvas implements Runnable { //Класс, в кото
 
         timer_for_floor1.schedule(new TimerTask() {
             @Override
-            public void run() {
-                floor1.setX(Constants.SPAWNx_FOR_FLOOR);
+            public void run()  {
+                    floor1.setX(Constants.SPAWNx_FOR_FLOOR);
             }
         }, Constants.DIPLAY, Constants.PERIOD_FOR_FLOOR1);
 
         timer_for_floor2.schedule(new TimerTask() {
             @Override
-            public void run() {
-                floor2.setX(Constants.SPAWNx_FOR_FLOOR);
+            public void run()  {
+                    floor2.setX(Constants.SPAWNx_FOR_FLOOR);
             }
         }, Constants.DIPLAY, Constants.PERIOD_FOR_FLOOR2);
 
@@ -181,22 +202,20 @@ public class Game extends Canvas implements Runnable { //Класс, в кото
         String points = String.valueOf(points_cnt);
         g.setColor(Color.white);
         g.setFont(new Font("TimesRoman", Font.PLAIN, Constants.FONT_SIZE));
-        g.drawString(points,10,20);
+        g.drawString(points,Constants.WIDTH-60,20);
 
+        laser.image.draw(g, 20, -27);
         if (hero != null) {
             hero.image.draw(g, hero.getX(), hero.getY());
         }
          if (gameOver) {
              TheRecord = points_cnt;
-             points_cnt = 0;
-             if (cnt1 == 10) {
-                 try {
-                     TimeUnit.SECONDS.sleep(4);//сон
-                 } catch (Exception e) {
-                     System.out.print(e);
-                 }
-             }
-             hero.image.draw(g,hero.getX(),hero.getY());
+             Game.getSprite("pictures/Gam1.png").draw(g, 500, 200);
+                 Game.getSprite("pictures/Gam1.png").draw(g, 500, 200);
+                 String points_max = String.valueOf(TheRecord);
+                 g.setColor(Color.white);
+                 g.setFont(new Font("TimesRoman", Font.PLAIN, Constants.FONT_SIZE));
+                 g.drawString(points, 800, 498);
          }
 
 
@@ -211,6 +230,7 @@ public class Game extends Canvas implements Runnable { //Класс, в кото
 
 
         hero.processJump();
+        hero.processLeft();
 
         if (hero.processOverlaps()){
             gameOver = true;
@@ -224,9 +244,10 @@ public class Game extends Canvas implements Runnable { //Класс, в кото
             hero.processUpPressed();
 
 
-            floor1.Floor_Moving(delta);
-            floor2.Floor_Moving(delta);
-
+          if (!gameOver) {
+              floor1.Floor_Moving(delta);
+              floor2.Floor_Moving(delta);
+          }
 
             if (leftPressed) {
                 Hero.runningLeft(delta); //бег для героя, смотри в классе hero
